@@ -15,6 +15,40 @@ const config = {
 };
 
 
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+    if(!userAuth) return;
+
+    const userRef = firestore.doc(`ùsers/${userAuth.uid}`);
+
+    const snapShop = await userRef.get();
+
+    console.log(snapShop);
+
+
+    // checks if users are in database and adds users to firestore database
+    if(!snapShop.exists) {
+        const {displayName, email} = userAuth;
+        const createdAt = new Date();
+
+        try {
+            await userRef.set({
+                displayName,
+                email,
+                createdAt,
+                ...additionalData
+            })
+
+        } catch (error) { 
+            console.log('error creating user', error.message);
+        
+        }
+
+    }
+
+    return userRef;
+    
+};
+
 firebase.initializeApp(config);
 
 export const auth = firebase.auth();
